@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+    
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+       	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+       	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+       	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+       	http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd
+       	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+	
+	<!--mybatis:scan 会将com.yongkj.pocketyun.mapper包里的所有接口当做mapper配置，之后可以自动引入mapper类-->
+	<mybatis:scan base-package="com.yongkj.pocketyun.mapper"/>
+	
+	<!--扫描将com.yongkj.pocketyun包里下的所有java文件，有spring的相关注解的类，则把这些类注册为spring的bean，之后可以自动引入mapper类-->
+	<context:component-scan base-package="com.yongkj.pocketyun"/>
+	
+	<!--加载数据源数据-->
+	<context:property-override location="classpath:db.properties"/>
+	<!--配置c3p0数据源-->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"/>
+	<!--配置mybatis整合Spring的bean-->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" p:dataSource-ref="dataSource"/>
+	<!--jdbc事物管理器配置-->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource"/>
+	<!--启用支持annotation注解方式事物管理-->
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+	
+	<!-- 定义文件上传解析器 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 设定默认编码 -->
+		<property name="defaultEncoding" value="UTF-8"></property>
+		<!-- 设定文件上传的最大值为5MB，5*1024*1024 <property name="maxUploadSize" value="5242880"></property>-->
+		<!-- 设定文件上传时写入内存的最大值，如果小于这个参数不会生成临时文件，默认为10240 -->
+		<property name="maxUploadSize" value="10737418240"></property>
+		<property name="maxInMemorySize" value="10240"></property>
+		<!-- 上传文件的临时路径 -->
+		<property name="uploadTempDir" value="kindeditorImage"></property>
+		<!-- 延迟文件解析 -->
+		<property name="resolveLazily" value="true"/>
+	</bean>
+</beans>
